@@ -101,12 +101,12 @@ public class CompactData {
         long low = Long.valueOf(df.format(Double.valueOf(split[3]) * KEY_MULTIPLIER));
         wgs84[position] = (high << 32) | low;
 
-        meter[position] = Integer.valueOf(split[4] + split[5]);
+        meter[position] = Integer.valueOf(split[4]) * 1000 +  Integer.valueOf(split[5]);
 
         if (split[6].length() != FACTORY_CODE_SIZE) {
             throw new RuntimeException("Problem with FACTORY_CODE_SIZE");
         }
-        System.arraycopy(factoryCode, position * FACTORY_CODE_SIZE, split[6].getBytes(), 0, FACTORY_CODE_SIZE);
+        System.arraycopy(split[6].getBytes(), 0, factoryCode, position * FACTORY_CODE_SIZE, FACTORY_CODE_SIZE);
 
     }
 
