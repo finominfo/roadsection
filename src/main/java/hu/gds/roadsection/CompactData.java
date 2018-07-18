@@ -18,7 +18,6 @@ public class CompactData {
     private static final int KEY_MULTIPLIER = 100_000;
     private static final double SIZE_MULTIPLIER = 1.5;
     private static final int START_SIZE = 100;
-    private static final int TOO_CLOSE_DIFFERENCE = 10;
     private static final int FACTORY_CODE_SIZE = 3;
     private volatile int maxSize = START_SIZE;
     private final AtomicInteger currentSize = new AtomicInteger(0);
@@ -43,21 +42,27 @@ public class CompactData {
     }
 
     private void addToPosition(String[] split, final int position) {
-        if (maxSize - position <= TOO_CLOSE_DIFFERENCE) {
-            lock.lock();
-            try {
-                if (position >= maxSize) {
-                    if (position == maxSize) {
-                        extendSize();
-                    }
-                    addToPosition(split, position);
-                    return;
-                }
-            } finally {
-                lock.unlock();
-            }
+        if (position == maxSize) {
+            extendSize();
         }
         makeAdd(split, position);
+    }
+
+    public void addParallel(String[] split) {
+        addToPositionParallel(split, currentSize.getAndIncrement());
+    }
+
+
+    private void addToPositionParallel(String[] split, final int position) {
+        lock.lock();
+        try {
+            if (position == maxSize) {
+                extendSize();
+            }
+            makeAdd(split, position);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void extendSize() {
@@ -101,7 +106,7 @@ public class CompactData {
         long low = Long.valueOf(df.format(Double.valueOf(split[3]) * KEY_MULTIPLIER));
         wgs84[position] = (high << 32) | low;
 
-        meter[position] = Integer.valueOf(split[4]) * 1000 +  Integer.valueOf(split[5]);
+        meter[position] = Integer.valueOf(split[4]) * 1000 + Integer.valueOf(split[5]);
 
         if (split[6].length() != FACTORY_CODE_SIZE) {
             throw new RuntimeException("Problem with FACTORY_CODE_SIZE");
