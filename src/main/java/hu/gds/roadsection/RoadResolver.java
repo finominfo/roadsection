@@ -3,7 +3,6 @@ package hu.gds.roadsection;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -77,8 +76,21 @@ public class RoadResolver {
         return datas.get(minimumPosition);
     }
 
+    public Data getFromNMEA(double nmeaLatitude, double nmeaLongitude) {
+        return get(nmea2Wgs(nmeaLatitude), nmea2Wgs(nmeaLongitude));
+    }
+
+    public static double nmea2Wgs(double nmea) {
+        double wgs84 = nmea / 100;
+        int whole = (int)wgs84;
+        return (double)whole + ((wgs84 - whole) * 1.6666666666666667D);
+    }
+
 
     public static void main(String[] args) throws Exception {
+
+//        System.out.println(nmea2Wgs(1212D));
+
         RoadResolver roadResolver = new RoadResolver();
         Random random = new Random();
         int bigDistance = 0;
@@ -89,7 +101,7 @@ public class RoadResolver {
         br.readLine();
         String line;
         while ((line = br.readLine()) != null) {
-            if (random.nextInt(100) < 10) {
+            if (random.nextInt(100) < 100) {
                 String[] split = line.split(SPLIT);
                 Data data = roadResolver.get(Double.valueOf(split[2]), Double.valueOf(split[3]));
                 if (data.getDistance() > 10_000) {
