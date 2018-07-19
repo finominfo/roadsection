@@ -56,10 +56,7 @@ public class CompactData {
     private void addToPositionParallel(String[] split, final int position) {
         lock.lock();
         try {
-            if (position == maxSize) {
-                extendSize();
-            }
-            makeAdd(split, position);
+            addToPosition(split, position);
         } finally {
             lock.unlock();
         }
