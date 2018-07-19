@@ -6,12 +6,14 @@ public class Data {
     private final int runCode;
     private final int distanceInMeter;
     private final String factoryCode;
+    private final long distance;
 
-    public Data(String roadName, int runCode, int distanceInMeter, String factoryCode) {
+    public Data(String roadName, int runCode, int distanceInMeter, String factoryCode, long distance) {
         this.roadName = roadName;
         this.runCode = runCode;
         this.distanceInMeter = distanceInMeter;
         this.factoryCode = factoryCode;
+        this.distance = distance;
     }
 
     public String getRoadName() {
@@ -28,5 +30,9 @@ public class Data {
 
     public String getFactoryCode() {
         return factoryCode;
+    }
+
+    public long getDistance() {
+        return distance;
     }
 }

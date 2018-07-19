@@ -30,7 +30,8 @@ public class RoadResolver {
                 temporarySizeMeasurement.get(key).incrementAndGet();
             }
             br.close();
-            for (int i = 0; i <= 0xffff; i++)  roadSections.put(i, new FixedSizeCompactData(temporarySizeMeasurement.get(i).get()));
+            for (int i = 0; i <= 0xffff; i++)
+                roadSections.put(i, new FixedSizeCompactData(temporarySizeMeasurement.get(i).get()));
             temporarySizeMeasurement.clear();
             br = new BufferedReader(new FileReader(new File(CSV)));
             br.readLine();
@@ -53,16 +54,43 @@ public class RoadResolver {
     public Data get(double wgs84Latitude, double wgs84Longitude) {
         DecimalFormat df = new DecimalFormat("#");
         df.setRoundingMode(RoundingMode.HALF_UP);
-        int key = CRC16.get(df.format(wgs84Latitude * KEY_MULTIPLIER) + df.format(wgs84Longitude * KEY_MULTIPLIER));
-        return roadSections.get(key).get(wgs84Latitude, wgs84Longitude);
+        double wgs84LatitudeZero = wgs84Latitude * KEY_MULTIPLIER;
+        double wgs84LongitudeZero = wgs84Longitude * KEY_MULTIPLIER;
+        List<Double> keyLatitudes = Arrays.asList(wgs84LatitudeZero, wgs84LatitudeZero + 1, wgs84LatitudeZero - 1);
+        List<Double> keyLongitudes = Arrays.asList(wgs84LongitudeZero, wgs84LongitudeZero + 1, wgs84LongitudeZero - 1);
+        List<Data> datas = new ArrayList<>();
+        for (Double lat : keyLatitudes) {
+            for (Double lon : keyLongitudes) {
+                int key = CRC16.get(df.format(lat) + df.format(lon));
+                datas.add(roadSections.get(key).get(wgs84Latitude, wgs84Longitude));
+            }
+        }
+        long minimumDistance = Long.MAX_VALUE;
+        int minimumPosition = 0;
+        for (int i = 0; i < datas.size(); i++) {
+            if (datas.get(i).getDistance() < minimumDistance) {
+                minimumDistance = datas.get(i).getDistance();
+                minimumPosition = i;
+            }
+        }
+        return datas.get(minimumPosition);
     }
 
 
     public static void main(String[] args) {
         RoadResolver roadResolver = new RoadResolver();
         Random random = new Random();
-        for (int i = 0; i < 10_000_000; i ++) {
-            roadResolver.get(random.nextDouble() + 46D, random.nextDouble() + 16D);
+        int bigDistance = 0;
+        int smallDistance = 0;
+        for (int i = 0; i < 1_000_000; i++) {
+            Data data = roadResolver.get(random.nextDouble() * 1D + 46D, random.nextDouble() * 1D + 16D);
+            if (data.getDistance() > 1_000_000) {
+                bigDistance++;
+            } else if (data.getDistance() < 100) {
+                smallDistance++;
+            }
         }
+        System.out.println("Big distances: " + bigDistance);
+        System.out.println("Small distances: " + smallDistance);
     }
 }

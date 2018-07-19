@@ -75,14 +75,11 @@ public class FixedSizeCompactData {
                 minimumPosition = i;
             }
         }
-        if (minimumDistance < 1L) {
-            System.out.println(minimumDistance);
-        }
         String retRoadName = (roadName[minimumPosition] & CODE_FOR_M) == CODE_FOR_M
                 ? "M" + (roadName[minimumPosition] ^ CODE_FOR_M)
                 : "" + roadName[minimumPosition];
         String retFactoryCode = new String(factoryCode, minimumPosition * FACTORY_CODE_SIZE, FACTORY_CODE_SIZE);
-        return new Data(retRoadName, runCode[minimumPosition], meter[minimumPosition], retFactoryCode);
+        return new Data(retRoadName, runCode[minimumPosition], meter[minimumPosition], retFactoryCode, minimumDistance);
     }
 
     public int getSize() {
