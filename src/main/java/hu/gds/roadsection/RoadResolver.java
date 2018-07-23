@@ -58,22 +58,22 @@ public class RoadResolver {
         double wgs84LongitudeZero = wgs84Longitude * KEY_MULTIPLIER;
         List<Double> keyLatitudes = Arrays.asList(wgs84LatitudeZero, wgs84LatitudeZero + 1, wgs84LatitudeZero - 1);
         List<Double> keyLongitudes = Arrays.asList(wgs84LongitudeZero, wgs84LongitudeZero + 1, wgs84LongitudeZero - 1);
-        List<Data> datas = new ArrayList<>();
+        List<Data> data = new ArrayList<>();
         for (Double lat : keyLatitudes) {
             for (Double lon : keyLongitudes) {
                 int key = CRC16.get(df.format(lat) + df.format(lon));
-                datas.add(roadSections.get(key).get(wgs84Latitude, wgs84Longitude));
+                data.add(roadSections.get(key).get(wgs84Latitude, wgs84Longitude));
             }
         }
         long minimumDistance = Long.MAX_VALUE;
         int minimumPosition = 0;
-        for (int i = 0; i < datas.size(); i++) {
-            if (datas.get(i).getDistance() < minimumDistance) {
-                minimumDistance = datas.get(i).getDistance();
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).getDistance() < minimumDistance) {
+                minimumDistance = data.get(i).getDistance();
                 minimumPosition = i;
             }
         }
-        return datas.get(minimumPosition);
+        return data.get(minimumPosition);
     }
 
     public Data getFromNMEA(double nmeaLatitude, double nmeaLongitude) {
@@ -82,8 +82,8 @@ public class RoadResolver {
 
     public static double nmea2Wgs(double nmea) {
         double wgs84 = nmea / 100;
-        int whole = (int)wgs84;
-        return (double)whole + ((wgs84 - whole) * 1.6666666666666667D);
+        double wholePart = Math.floor(wgs84);
+        return wholePart + ((wgs84 - wholePart) * 1.6666666666666667D);
     }
 
 

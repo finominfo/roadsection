@@ -4,14 +4,18 @@ public class Data {
 
     private final String roadName;
     private final int runCode;
-    private final int distanceInMeter;
+    private final int allInMeter;
+    private final int meter;
+    private final int kMeter;
     private final String factoryCode;
     private final long distance;
 
-    public Data(String roadName, int runCode, int distanceInMeter, String factoryCode, long distance) {
+    public Data(String roadName, int runCode, int allInMeter, String factoryCode, long distance) {
         this.roadName = roadName;
         this.runCode = runCode;
-        this.distanceInMeter = distanceInMeter;
+        this.allInMeter = allInMeter;
+        this.meter = allInMeter % 1000;
+        this.kMeter = allInMeter / 1000;
         this.factoryCode = factoryCode;
         this.distance = distance;
     }
@@ -24,8 +28,16 @@ public class Data {
         return runCode;
     }
 
-    public int getDistanceInMeter() {
-        return distanceInMeter;
+    public int getAllInMeter() {
+        return allInMeter;
+    }
+
+    public int getMeter() {
+        return meter;
+    }
+
+    public int getkMeter() {
+        return kMeter;
     }
 
     public String getFactoryCode() {
